@@ -73,9 +73,7 @@ namespace Skoruba.IdentityServer4.Admin.EntityFramework.Repositories.Interfaces
 
 	    Task<int> DeleteClientPropertyAsync(ClientProperty clientProperty);
 
-        List<string> GetSigningAlgorithms(string algorithm, int limit = 0);
-
-        Task<int> SaveAllChangesAsync();
+	    Task<int> SaveAllChangesAsync();
 
         bool AutoSaveChanges { get; set; }
     }

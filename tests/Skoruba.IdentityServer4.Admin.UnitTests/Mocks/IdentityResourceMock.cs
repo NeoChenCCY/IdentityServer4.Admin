@@ -42,9 +42,9 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mocks
 		    return identityResourcePropertyFaker;
 	    }
 
-		public static Faker<IdentityResourceClaim> GetIdentityClaimFaker(int id)
+		public static Faker<IdentityClaim> GetIdentityClaimFaker(int id)
         {
-            var fakerIdentityClaim = new Faker<IdentityResourceClaim>()
+            var fakerIdentityClaim = new Faker<IdentityClaim>()
                 .RuleFor(o => o.Type, f => Guid.NewGuid().ToString())
                 .RuleFor(o => o.Id, id);
 

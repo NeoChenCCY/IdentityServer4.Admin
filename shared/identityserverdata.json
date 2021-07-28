@@ -61,22 +61,19 @@
                 ]
             }
         ],
-        "ApiScopes": [
-            {
-                "Name": "skoruba_identity_admin_api",
-                "DisplayName": "skoruba_identity_admin_api",
-                "Required": true,
-                "UserClaims": [
-                    "role",
-                    "name"
-                ]
-            }
-        ],
         "ApiResources": [
             {
                 "Name": "skoruba_identity_admin_api",
                 "Scopes": [
-                    "skoruba_identity_admin_api"
+                    {
+                        "Name": "skoruba_identity_admin_api",
+                        "DisplayName": "skoruba_identity_admin_api",
+                        "Required": true,
+                        "UserClaims": [
+                            "role",
+                            "name"
+                        ]
+                    }
                 ]
             }
         ],

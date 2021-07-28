@@ -1,20 +1,22 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Skoruba.IdentityServer4.Admin.EntityFramework.Configuration.Configuration;
+using Skoruba.IdentityServer4.Admin.Configuration;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.DbContexts;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Entities.Identity;
-using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Helpers;
-using Skoruba.IdentityServer4.Shared.Configuration.Helpers;
+using Skoruba.IdentityServer4.Admin.Helpers;
+using Skoruba.IdentityServer4.Shared.Helpers;
+using Microsoft.IdentityModel.Logging;
+using System.IO;
 
 namespace Skoruba.IdentityServer4.Admin
 {
-	public class Program
+    public class Program
     {
         private const string SeedArgs = "/seed";
 
@@ -28,12 +30,21 @@ namespace Skoruba.IdentityServer4.Admin
 
             try
             {
+                /* 啟用TLS */
+                //TLS 1.1 768,TLS 1.2 3072
+                //ServicePointManager.SecurityProtocol = (SecurityProtocolType)768 | (SecurityProtocolType)3072;
+
+                //使用Dacker服務
                 DockerHelpers.ApplyDockerConfiguration(configuration);
 
+                /* 
+                 * Deploying ASP.NET Core Web Applications 
+                 * 如我有用EF migrations 的話 Program.cs 要修改 
+                 * 
+                 */
                 var host = CreateHostBuilder(args).Build();
-
+                //輸入IdentityServer4系統用初始化專用的資料(Seed)
                 await ApplyDbMigrationsWithDataSeedAsync(args, configuration, host);
-
                 host.Run();
             }
             catch (Exception ex)
@@ -50,10 +61,21 @@ namespace Skoruba.IdentityServer4.Admin
         {
             var applyDbMigrationWithDataSeedFromProgramArguments = args.Any(x => x == SeedArgs);
             if (applyDbMigrationWithDataSeedFromProgramArguments) args = args.Except(new[] { SeedArgs }).ToArray();
-
+            
+            //抓取json設定檔(appsettings)裡面，SeedConfiguration欄位的ApplySeed屬性，設定的數值。
             var seedConfiguration = configuration.GetSection(nameof(SeedConfiguration)).Get<SeedConfiguration>();
+
             var databaseMigrationsConfiguration = configuration.GetSection(nameof(DatabaseMigrationsConfiguration))
                 .Get<DatabaseMigrationsConfiguration>();
+
+            //抓取json設定檔(appsettings)失敗時處理機制
+            if (seedConfiguration is null || databaseMigrationsConfiguration is null) 
+            {
+                seedConfiguration = new SeedConfiguration();
+                seedConfiguration.ApplySeed = true;
+                databaseMigrationsConfiguration = new DatabaseMigrationsConfiguration();
+                databaseMigrationsConfiguration.ApplyDatabaseMigrations = false;
+            }           
 
             await DbMigrationHelpers
                 .ApplyDbMigrationsWithDataSeedAsync<IdentityServerConfigurationDbContext, AdminIdentityDbContext,
@@ -67,12 +89,16 @@ namespace Skoruba.IdentityServer4.Admin
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var isDevelopment = environment == Environments.Development;
 
-            var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
-                .AddJsonFile("serilog.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"serilog.{environment}.json", optional: true, reloadOnChange: true);
+            
+            ///* 載入專案所有相關的json設定檔(appsettings) */
+            //var configurationBuilder = new ConfigurationBuilder()
+            //    .SetBasePath(Directory.GetCurrentDirectory())
+            //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            //    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+            //    .AddJsonFile("serilog.json", optional: true, reloadOnChange: true)
+            //    .AddJsonFile($"serilog.{environment}.json", optional: true, reloadOnChange: true);            
+
+            var configurationBuilder = new ConfigurationBuilder();
 
             if (isDevelopment)
             {
@@ -88,25 +114,32 @@ namespace Skoruba.IdentityServer4.Admin
 
             return configurationBuilder.Build();
         }
-
+        
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                  .ConfigureAppConfiguration((hostContext, configApp) =>
                  {
-                     var configurationRoot = configApp.Build();
+                     /* configApp是主機Host的相關json設定檔 */
 
-                     configApp.AddJsonFile("serilog.json", optional: true, reloadOnChange: true);
-                     configApp.AddJsonFile("identitydata.json", optional: true, reloadOnChange: true);
-                     configApp.AddJsonFile("identityserverdata.json", optional: true, reloadOnChange: true);
+                     var configurationRoot = configApp.Build();
+                     
+                     ///* 載入專案所有相關的json設定檔(DbMigration在用的seed) */                     
+                     //configApp.AddJsonFile("serilog.json", optional: true, reloadOnChange: true);
+                     //configApp.AddJsonFile("identitydata.json", optional: true, reloadOnChange: true);
+                     //configApp.AddJsonFile("identityserverdata.json", optional: true, reloadOnChange: true);                     
 
                      var env = hostContext.HostingEnvironment;
-
-                     configApp.AddJsonFile($"serilog.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-                     configApp.AddJsonFile($"identitydata.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-                     configApp.AddJsonFile($"identityserverdata.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-
+                     
+                     ///* 載入專案所有相關的json設定檔 */                     
+                     //configApp.AddJsonFile($"serilog.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                     //configApp.AddJsonFile($"identitydata.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                     //configApp.AddJsonFile($"identityserverdata.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                     
                      if (env.IsDevelopment())
                      {
+                         /* PII是.NET Core隱藏錯誤訊息的方式 */
+                         IdentityModelEventSource.ShowPII = true;
+                         
                          configApp.AddUserSecrets<Startup>();
                      }
 

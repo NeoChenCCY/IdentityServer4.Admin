@@ -13,20 +13,20 @@
             {
                 "Name": "File",
                 "Args": {
-                    "path": "Log/skoruba_admin.txt",
+                    "path": "Log\\skoruba_admin.txt",
                     "rollingInterval": "Day"
                 }
             },
             {
                 "Name": "MSSqlServer",
-                "Args": {
-                    "connectionString": "Server=(localdb)\\mssqllocaldb;Database=IdentityServer4Admin;Trusted_Connection=True;MultipleActiveResultSets=true",
-                    "tableName": "Log",
-                    "columnOptionsSection": {
-                        "addStandardColumns": [ "LogEvent" ],
-                        "removeStandardColumns": [ "Properties" ]
-                    }
+              "Args": {
+                "connectionString": "Data Source=192.168.0.12;Database=IdentityServer4Admin;Trusted_Connection=True;MultipleActiveResultSets=true;User ID=sa;Password=tp6tjp6mp6",
+                "tableName": "Log",
+                "columnOptionsSection": {
+                  "addStandardColumns": [ "LogEvent" ],
+                  "removeStandardColumns": [ "Properties" ]
                 }
+              }
             }
         ]
     }

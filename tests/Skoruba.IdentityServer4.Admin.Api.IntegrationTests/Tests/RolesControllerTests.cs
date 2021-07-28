@@ -11,7 +11,7 @@ namespace Skoruba.IdentityServer4.Admin.Api.IntegrationTests.Tests
 {
     public class RolesControllerTests : BaseClassFixture
     {
-        public RolesControllerTests(TestFixture fixture) : base(fixture)
+        public RolesControllerTests(WebApplicationFactory<StartupTest> factory) : base(factory)
         {
         }
 

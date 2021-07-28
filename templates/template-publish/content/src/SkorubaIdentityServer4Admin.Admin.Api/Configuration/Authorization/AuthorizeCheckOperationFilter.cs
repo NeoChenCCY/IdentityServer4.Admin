@@ -47,5 +47,3 @@ namespace SkorubaIdentityServer4Admin.Admin.Api.Configuration.Authorization
 
 
 
-
-

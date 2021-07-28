@@ -6,7 +6,6 @@
 using AutoMapper;
 using IdentityServer4.EntityFramework.Entities;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Dtos.Configuration;
-using Skoruba.IdentityServer4.Admin.BusinessLogic.Mappers.Converters;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Shared.Dtos.Common;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Extensions.Common;
 
@@ -19,9 +18,7 @@ namespace Skoruba.IdentityServer4.Admin.BusinessLogic.Mappers
             // entity to model
             CreateMap<Client, ClientDto>(MemberList.Destination)
                 .ForMember(dest => dest.ProtocolType, opt => opt.Condition(srs => srs != null))
-                .ForMember(x => x.AllowedIdentityTokenSigningAlgorithms, opts => opts.ConvertUsing(AllowedSigningAlgorithmsConverter.Converter, x => x.AllowedIdentityTokenSigningAlgorithms))
-                .ReverseMap()
-                .ForMember(x => x.AllowedIdentityTokenSigningAlgorithms, opts => opts.ConvertUsing(AllowedSigningAlgorithmsConverter.Converter, x => x.AllowedIdentityTokenSigningAlgorithms));
+                .ReverseMap();
 
             CreateMap<SelectItem, SelectItemDto>(MemberList.Destination)
                 .ReverseMap();

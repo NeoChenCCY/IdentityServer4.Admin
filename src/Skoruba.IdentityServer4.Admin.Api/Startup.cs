@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,9 +19,9 @@ using Skoruba.IdentityServer4.Admin.Api.Mappers;
 using Skoruba.IdentityServer4.Admin.Api.Resources;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.DbContexts;
 using Skoruba.IdentityServer4.Admin.EntityFramework.Shared.Entities.Identity;
-using Skoruba.IdentityServer4.Shared.Configuration.Helpers;
 using Skoruba.IdentityServer4.Shared.Dtos;
 using Skoruba.IdentityServer4.Shared.Dtos.Identity;
+using Skoruba.IdentityServer4.Shared.Helpers;
 
 namespace Skoruba.IdentityServer4.Admin.Api
 {
@@ -28,7 +29,6 @@ namespace Skoruba.IdentityServer4.Admin.Api
     {
         public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             HostingEnvironment = env;
             Configuration = configuration;
         }
@@ -134,8 +134,7 @@ namespace Skoruba.IdentityServer4.Admin.Api
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
-
+                endpoints.MapDefaultControllerRoute();
                 endpoints.MapHealthChecks("/health", new HealthCheckOptions
                 {
                     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
@@ -145,7 +144,7 @@ namespace Skoruba.IdentityServer4.Admin.Api
 
         public virtual void RegisterDbContexts(IServiceCollection services)
         {
-            services.AddDbContexts<AdminIdentityDbContext, IdentityServerConfigurationDbContext, IdentityServerPersistedGrantDbContext, AdminLogDbContext, AdminAuditLogDbContext, IdentityServerDataProtectionDbContext, AuditLog>(Configuration);
+            services.AddDbContexts<AdminIdentityDbContext, IdentityServerConfigurationDbContext, IdentityServerPersistedGrantDbContext, AdminLogDbContext, AdminAuditLogDbContext, IdentityServerDataProtectionDbContext>(Configuration);
         }
 
         public virtual void RegisterAuthentication(IServiceCollection services)

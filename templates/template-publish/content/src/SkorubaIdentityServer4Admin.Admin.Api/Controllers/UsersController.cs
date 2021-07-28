@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using IdentityModel;
+using IdentityServer4.AccessTokenValidation;
+using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -196,7 +198,11 @@ namespace SkorubaIdentityServer4Admin.Admin.Api.Controllers
         {
             var userClaimDto = _mapper.Map<TUserClaimsDto>(claim);
 
-            await _identityService.GetUserClaimAsync(userClaimDto.UserId.ToString(), userClaimDto.ClaimId);
+            if (!userClaimDto.ClaimId.Equals(default))
+            {
+                return BadRequest(_errorResources.CannotSetId());
+            }
+
             await _identityService.UpdateUserClaimsAsync(userClaimDto);
 
             return Ok();
@@ -273,8 +279,6 @@ namespace SkorubaIdentityServer4Admin.Admin.Api.Controllers
         }
     }
 }
-
-
 
 
 

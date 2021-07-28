@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Skoruba.IdentityServer4.Admin.Api.Configuration;
 using Skoruba.IdentityServer4.Admin.Api.Configuration.Test;
@@ -9,20 +8,21 @@ using Xunit;
 
 namespace Skoruba.IdentityServer4.Admin.Api.IntegrationTests.Tests.Base
 {
-    public class BaseClassFixture : IClassFixture<TestFixture>
+    public class BaseClassFixture : IClassFixture<WebApplicationFactory<StartupTest>>
     {
+        protected readonly WebApplicationFactory<StartupTest> Factory;
         protected readonly HttpClient Client;
-        protected readonly TestServer TestServer;
 
-        public BaseClassFixture(TestFixture fixture)
+        public BaseClassFixture(WebApplicationFactory<StartupTest> factory)
         {
-            Client = fixture.Client;
-            TestServer = fixture.TestServer;
+            Factory = factory;
+            Client = factory.SetupClient();
+            Factory.CreateClient();
         }
 
         protected virtual void SetupAdminClaimsViaHeaders()
         {
-            using (var scope = TestServer.Services.CreateScope())
+            using (var scope = Factory.Services.CreateScope())
             {
                 var configuration = scope.ServiceProvider.GetRequiredService<AdminApiConfiguration>();
                 Client.SetAdminClaimsViaHeaders(configuration);

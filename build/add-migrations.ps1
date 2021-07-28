@@ -1,4 +1,4 @@
-param([string] $migration = 'DbInit', [string] $migrationProviderName = 'All', [string] $targetContext = 'All')
+param([string] $migration = 'DbInit', [string] $migrationProviderName = 'All')
 $projectName = "Skoruba.IdentityServer4";
 $currentPath = Get-Location
 Set-Location "../src/$projectName.Admin"
@@ -12,7 +12,7 @@ $targetContexts = @{
     IdentityServerConfigurationDbContext  = "Migrations\IdentityServerConfiguration";
     IdentityServerPersistedGrantDbContext = "Migrations\IdentityServerGrants";
     AdminAuditLogDbContext                = "Migrations\AuditLogging";
-    IdentityServerDataProtectionDbContext = "Migrations\DataProtection";
+	IdentityServerDataProtectionDbContext = "Migrations\DataProtection";
 }
 
 #Initialize the db providers and it's respective projects
@@ -41,14 +41,10 @@ foreach ($provider in $dpProviders.Keys) {
         $settings | set-content appsettings.json
         if ((Test-Path $projectPath) -eq $true) {
             foreach ($context in $targetContexts.Keys) {
-                
-                if ($targetContext -eq 'All' -or $context -eq $targetContext) {
+                $migrationPath = $targetContexts[$context];
 
-                    $migrationPath = $targetContexts[$context];
-
-                    Write-Host "Migrating context " $context
-                    dotnet ef migrations add $migration -c $context -o $migrationPath -p $projectPath
-                }
+                Write-Host "Migrating context " $context
+                dotnet ef migrations add $migration -c $context -o $migrationPath -p $projectPath
             } 
         }
         

@@ -1,18 +1,18 @@
 ﻿using System.Net.Http;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Skoruba.IdentityServer4.STS.Identity.Configuration.Test;
+using Skoruba.IdentityServer4.STS.Identity.IntegrationTests.Common;
 using Xunit;
 
 namespace Skoruba.IdentityServer4.STS.Identity.IntegrationTests.Tests.Base
 {
-    public class BaseClassFixture : IClassFixture<TestFixture>
+    public class BaseClassFixture : IClassFixture<WebApplicationFactory<StartupTest>>
     {
         protected readonly HttpClient Client;
-        protected readonly TestServer TestServer;
 
-        public BaseClassFixture(TestFixture fixture)
+        public BaseClassFixture(WebApplicationFactory<StartupTest> factory)
         {
-            Client = fixture.Client;
-            TestServer = fixture.TestServer;
+            Client = factory.SetupClient();
         }
     }
 }

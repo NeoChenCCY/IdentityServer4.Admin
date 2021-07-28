@@ -15,6 +15,17 @@ namespace SkorubaIdentityServer4Admin.Admin.Api.Mappers
             CreateMap<ApiResourceDto, ApiResourceApiDto>(MemberList.Destination)
                 .ReverseMap();
 
+            // Api Scopes
+            CreateMap<ApiScopesDto, ApiScopesApiDto>(MemberList.Destination)
+                .ReverseMap();
+
+            CreateMap<ApiScopeDto, ApiScopeApiDto>(MemberList.Destination)
+                .ReverseMap();
+            
+            CreateMap<ApiScopesDto, ApiScopeApiDto>(MemberList.Destination)
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ApiScopeId))
+                .ReverseMap();
+
             // Api Secrets
             CreateMap<ApiSecretsDto, ApiSecretApiDto>(MemberList.Destination)
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ApiSecretId))
@@ -33,8 +44,6 @@ namespace SkorubaIdentityServer4Admin.Admin.Api.Mappers
         }
     }
 }
-
-
 
 
 

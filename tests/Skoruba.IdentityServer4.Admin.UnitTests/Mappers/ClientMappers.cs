@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using FluentAssertions;
 using Skoruba.IdentityServer4.Admin.BusinessLogic.Mappers;
-using Skoruba.IdentityServer4.Admin.BusinessLogic.Mappers.Converters;
 using Skoruba.IdentityServer4.Admin.UnitTests.Mocks;
 using Xunit;
 
@@ -28,8 +27,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
                        .Excluding(o => o.AllowedGrantTypes)
                        .Excluding(o => o.AllowedScopes)
 					   .Excluding(o => o.Created)
-                       .Excluding(o => o.AllowedIdentityTokenSigningAlgorithms)
-                       .Excluding(o => o.IdentityProviderRestrictions));
+					   .Excluding(o => o.IdentityProviderRestrictions));
 
             //Assert collection
             client.AllowedCorsOrigins.Select(x => x.Origin).ShouldBeEquivalentTo(clientDto.AllowedCorsOrigins);
@@ -38,8 +36,6 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             client.AllowedGrantTypes.Select(x => x.GrantType).ShouldBeEquivalentTo(clientDto.AllowedGrantTypes);
             client.AllowedScopes.Select(x => x.Scope).ShouldBeEquivalentTo(clientDto.AllowedScopes);
             client.IdentityProviderRestrictions.Select(x => x.Provider).ShouldBeEquivalentTo(clientDto.IdentityProviderRestrictions);
-            var allowedAlgList = AllowedSigningAlgorithmsConverter.Converter.Convert(client.AllowedIdentityTokenSigningAlgorithms, null);
-            allowedAlgList.ShouldBeEquivalentTo(clientDto.AllowedIdentityTokenSigningAlgorithms);
         }
 
         [Fact]
@@ -59,8 +55,7 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
                     .Excluding(o => o.PostLogoutRedirectUris)
                     .Excluding(o => o.AllowedGrantTypes)
                     .Excluding(o => o.AllowedScopes)
-                    .Excluding(o => o.AllowedIdentityTokenSigningAlgorithms)
-                    .Excluding(o => o.Created)
+	                .Excluding(o => o.Created)
 					.Excluding(o => o.IdentityProviderRestrictions));
 
             //Assert collection
@@ -70,8 +65,6 @@ namespace Skoruba.IdentityServer4.Admin.UnitTests.Mappers
             client.AllowedGrantTypes.Select(x => x.GrantType).ShouldBeEquivalentTo(clientDto.AllowedGrantTypes);
             client.AllowedScopes.Select(x => x.Scope).ShouldBeEquivalentTo(clientDto.AllowedScopes);
             client.IdentityProviderRestrictions.Select(x => x.Provider).ShouldBeEquivalentTo(clientDto.IdentityProviderRestrictions);
-            var allowedAlgList = AllowedSigningAlgorithmsConverter.Converter.Convert(client.AllowedIdentityTokenSigningAlgorithms, null);
-            allowedAlgList.ShouldBeEquivalentTo(clientDto.AllowedIdentityTokenSigningAlgorithms);
         }
 
         [Fact]

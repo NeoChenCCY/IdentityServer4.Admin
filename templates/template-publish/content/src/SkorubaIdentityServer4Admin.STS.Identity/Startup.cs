@@ -12,7 +12,8 @@ using SkorubaIdentityServer4Admin.STS.Identity.Configuration.Constants;
 using SkorubaIdentityServer4Admin.STS.Identity.Configuration.Interfaces;
 using SkorubaIdentityServer4Admin.STS.Identity.Helpers;
 using System;
-using Skoruba.IdentityServer4.Shared.Configuration.Helpers;
+using Microsoft.AspNetCore.DataProtection;
+using SkorubaIdentityServer4Admin.Shared.Helpers;
 
 namespace SkorubaIdentityServer4Admin.STS.Identity
 {
@@ -132,8 +133,6 @@ namespace SkorubaIdentityServer4Admin.STS.Identity
         }
     }
 }
-
-
 
 
 

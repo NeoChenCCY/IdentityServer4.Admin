@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Skoruba.IdentityServer4.Shared.Configuration.Helpers;
+using Skoruba.IdentityServer4.Shared.Helpers;
+using Microsoft.IdentityModel.Logging;
 
 namespace Skoruba.IdentityServer4.STS.Identity
 {
@@ -38,12 +39,17 @@ namespace Skoruba.IdentityServer4.STS.Identity
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var isDevelopment = environment == Environments.Development;
 
+            var configurationBuilder = new ConfigurationBuilder();
+
+            /*
+            //載入專案所有相關的json設定檔
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
                 .AddJsonFile("serilog.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"serilog.{environment}.json", optional: true, reloadOnChange: true);
+            */
 
             if (isDevelopment)
             {
@@ -66,14 +72,18 @@ namespace Skoruba.IdentityServer4.STS.Identity
                  {
                      var configurationRoot = configApp.Build();
 
-                     configApp.AddJsonFile("serilog.json", optional: true, reloadOnChange: true);
+                     //載入專案所有相關的json設定檔
+                     // configApp.AddJsonFile("serilog.json", optional: true, reloadOnChange: true);
 
                      var env = hostContext.HostingEnvironment;
 
-                     configApp.AddJsonFile($"serilog.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                     //載入專案所有相關的json設定檔
+                     //configApp.AddJsonFile($"serilog.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
                      if (env.IsDevelopment())
                      {
+                         /* PII是.NET Core隱藏錯誤訊息的方式 */
+                         IdentityModelEventSource.ShowPII = true;
                          configApp.AddUserSecrets<Startup>();
                      }
 
